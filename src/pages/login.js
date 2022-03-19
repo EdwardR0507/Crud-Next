@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
+import { useRouter } from "next/router";
 import { LockClosedIcon } from "@heroicons/react/solid";
 import { useAuth } from "@hooks/useAuth";
 export default function Login() {
   const [error, setError] = useState({ state: false, message: null });
-
+  const router = useRouter();
   const emailRef = useRef();
   const passwordRef = useRef();
   const { signIn } = useAuth();
@@ -13,7 +14,8 @@ export default function Login() {
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
     signIn(email, password)
-      .then((res) => {
+      .then(() => {
+        router.push("/dashboard");
         setError({ state: false, message: null });
       })
       .catch((err) => {
