@@ -1,14 +1,32 @@
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import { LockClosedIcon } from "@heroicons/react/solid";
-
+import { useAuth } from "@hooks/useAuth";
 export default function Login() {
+  const [error, setError] = useState({ state: false, message: null });
+
   const emailRef = useRef();
   const passwordRef = useRef();
+  const { signIn } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const email = emailRef.current.value;
+    const password = passwordRef.current.value;
+    signIn(email, password)
+      .then((res) => {
+        setError({ state: false, message: null });
+      })
+      .catch((err) => {
+        const errorType = {
+          401: () => "Invalid email or password",
+          500: () => "Internal server error",
+        };
+        const errorDefault = "Something went wrong";
+        setError({ state: true, message: errorType[err.response.status] ? errorType[err.response.status]() : errorDefault });
+      });
   };
 
+  console.log(error.message);
   return (
     <>
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -66,7 +84,7 @@ export default function Login() {
                 </a>
               </div>
             </div>
-
+            {error.state && <span className="text-sm text-red-600">{error.message}</span>}
             <div>
               <button
                 type="submit"
