@@ -21,7 +21,6 @@ function classNames(...classes) {
 
 export default function Header() {
   const { user } = useAuth();
-  console.log(user);
   const userData = {
     name: user?.name,
     email: user?.email,
