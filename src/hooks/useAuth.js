@@ -47,7 +47,7 @@ function useProviderAuth() {
       Cookie.set("token", access_token, { expires: 5 });
       axios.defaults.headers.Authorization = `Bearer ${access_token}`;
       const { data } = await axios.get(endPoints.auth.profile);
-      await setUser(fakeData);
+      setUser(fakeData);
     }
   };
   return {

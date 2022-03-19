@@ -2,6 +2,8 @@ import { useState } from "react";
 import Paginate from "@components/Paginate";
 import { useFetch } from "@hooks/useFetch";
 import { endPoints } from "@services/api";
+import { Chart } from "@common/Chart";
+
 const people = [
   {
     name: "Jane Cooper",
@@ -12,18 +14,40 @@ const people = [
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60",
   },
 ];
-const PRODUCT_LIMIT = 5;
+const PRODUCT_LIMIT = 20;
 
 export default function Dashboard() {
   const [offsetProducts, setOffsetProducts] = useState(0);
-  // Use the 0,0 offset to get all products, so we can define the totalPages using the length of the data
+  // Use the 0,0 limit and offset to get all products, so we can define the totalPages using the length of the data
   const { data } = useFetch(endPoints.products.getProducts(0, 0));
   const totalProducts = data?.length;
   const { data: products } = useFetch(endPoints.products.getProducts(PRODUCT_LIMIT, offsetProducts));
 
+  console.log(products);
+  const categoryNames = products?.map((product) => product.category);
+  const categoryCount = categoryNames?.map((category) => category.name);
+
+  const countOccurrences = (arr) =>
+    arr?.reduce((prev, curr) => {
+      prev[curr] = (prev[curr] || 0) + 1;
+      return prev;
+    }, {});
+
+  const dataChart = {
+    datasets: [
+      {
+        label: "Categories",
+        data: countOccurrences(categoryCount),
+        borderWidth: 2,
+        backgroundColor: ["#ffbb11", "#c0c0c0", "#50AF95", "#f3ba2f", "#2a71d0"],
+      },
+    ],
+  };
+
   return (
     <>
-      {totalProducts > 0 && <Paginate totalItems={totalProducts} itemsPerPage={PRODUCT_LIMIT} setOffset={setOffsetProducts} neighbours={3}></Paginate>}
+      <Chart className="mb-8 mt-2" data={dataChart} />
+      {totalProducts > 0 && <Paginate totalItems={totalProducts} itemsPerPage={PRODUCT_LIMIT} setOffset={setOffsetProducts} neighbours={3} />}
       <div className="flex flex-col">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
