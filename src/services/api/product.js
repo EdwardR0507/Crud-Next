@@ -15,3 +15,12 @@ export const addProduct = async (body) => {
     console.log(error);
   }
 };
+
+export const deleteProduct = async (id) => {
+  try {
+    const response = await axios.delete(endPoints.products.deleteProduct(id));
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

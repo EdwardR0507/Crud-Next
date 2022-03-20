@@ -11,7 +11,6 @@ export default function FormProduct({ setAlert, setOpen }) {
   } = useForm({
     resolver: yupResolver(addProductSchema),
   });
-
   // Using a fake image link to send to the API
   const onSubmit = async (data) => {
     const formData = {
