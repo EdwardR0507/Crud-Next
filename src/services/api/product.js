@@ -24,3 +24,18 @@ export const deleteProduct = async (id) => {
     console.log(error);
   }
 };
+
+export const updateProduct = async (id, body) => {
+  const config = {
+    headers: {
+      accept: "*/*",
+      "Content-Type": "application/json",
+    },
+  };
+  try {
+    const response = await axios.put(endPoints.products.updateProduct(id), body, config);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

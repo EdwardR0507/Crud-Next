@@ -1,9 +1,11 @@
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addProductSchema } from "schemas/products/addProduct";
-import { addProduct } from "@services/api/product";
+import { addProduct, updateProduct } from "@services/api/product";
 
-export default function FormProduct({ setAlert, setOpen }) {
+export default function FormProduct({ product, setAlert, setOpen }) {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -20,24 +22,41 @@ export default function FormProduct({ setAlert, setOpen }) {
       categoryId: parseInt(data.category),
       images: ["https://randomwordgenerator.com/img/picture-generator/g09c51d6247f88abd6e9145c1fc2af08348ea95ceb3334a3ac87087f6c92fdb3c25a4ea29f42ede7b17dbb77aca344108_640.jpg"],
     };
-    try {
-      const response = await addProduct(formData);
-      if (response.id) {
+    if (product) {
+      try {
+        const res = await updateProduct(product.id, formData);
+        if (res.id) {
+          router.push("/dashboard/products");
+          setAlert({
+            active: true,
+            type: "success",
+            message: "Product updated successfully",
+            autoClose: false,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const response = await addProduct(formData);
+        if (response.id) {
+          setAlert({
+            active: true,
+            type: "success",
+            message: "Product added successfully",
+            autoClose: false,
+          });
+          setOpen(false);
+        }
+      } catch (error) {
         setAlert({
           active: true,
-          type: "success",
-          message: "Product added successfully",
+          type: "error",
+          message: `Error adding product: ${error.message}`,
           autoClose: false,
         });
-        setOpen(false);
       }
-    } catch (error) {
-      setAlert({
-        active: true,
-        type: "error",
-        message: `Error adding product: ${error.message}`,
-        autoClose: false,
-      });
     }
   };
   return (
@@ -50,6 +69,7 @@ export default function FormProduct({ setAlert, setOpen }) {
                 Title
               </label>
               <input
+                defaultValue={product?.title}
                 type="text"
                 name="title"
                 id="title"
@@ -63,6 +83,7 @@ export default function FormProduct({ setAlert, setOpen }) {
                 Price
               </label>
               <input
+                defaultValue={product?.price}
                 type="number"
                 name="price"
                 id="price"
@@ -76,6 +97,7 @@ export default function FormProduct({ setAlert, setOpen }) {
                 Category
               </label>
               <select
+                defaultValue={product?.category?.id}
                 id="category"
                 name="category"
                 autoComplete="category-name"
@@ -96,6 +118,7 @@ export default function FormProduct({ setAlert, setOpen }) {
                 Description
               </label>
               <textarea
+                defaultValue={product?.description}
                 name="description"
                 id="description"
                 autoComplete="description"
