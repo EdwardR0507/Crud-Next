@@ -18,8 +18,7 @@ const PRODUCT_LIMIT = 20;
 
 export default function Dashboard() {
   const [offsetProducts, setOffsetProducts] = useState(0);
-  // Use the 0,0 limit and offset to get all products, so we can define the totalPages using the length of the data
-  const { data } = useFetch(endPoints.products.getProducts(0, 0));
+  const { data } = useFetch(endPoints.products.getAllProducts);
   const totalProducts = data?.length;
   const { data: products } = useFetch(endPoints.products.getProducts(PRODUCT_LIMIT, offsetProducts));
 

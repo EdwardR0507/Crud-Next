@@ -1,8 +1,9 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addProductSchema } from "schemas/products/addProduct";
+import { addProduct } from "@services/api/product";
 
-export default function FormProduct({ setOpen }) {
+export default function FormProduct({ setAlert, setOpen }) {
   const {
     register,
     handleSubmit,
@@ -11,17 +12,34 @@ export default function FormProduct({ setOpen }) {
     resolver: yupResolver(addProductSchema),
   });
 
+  // Using a fake image link to send to the API
   const onSubmit = async (data) => {
-    console.log(data);
     const formData = {
       title: data.title,
       price: parseInt(data.price),
       description: data.description,
-      categoryId: parseInt(data.categoryId),
-      images: [data.images[0]?.name],
+      categoryId: parseInt(data.category),
+      images: ["https://randomwordgenerator.com/img/picture-generator/g09c51d6247f88abd6e9145c1fc2af08348ea95ceb3334a3ac87087f6c92fdb3c25a4ea29f42ede7b17dbb77aca344108_640.jpg"],
     };
-    console.log(formData);
-    setOpen(false);
+    try {
+      const response = await addProduct(formData);
+      if (response.id) {
+        setAlert({
+          active: true,
+          type: "success",
+          message: "Product added successfully",
+          autoClose: false,
+        });
+        setOpen(false);
+      }
+    } catch (error) {
+      setAlert({
+        active: true,
+        type: "error",
+        message: `Error adding product: ${error.message}`,
+        autoClose: false,
+      });
+    }
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
