@@ -1,18 +1,35 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
+import Cookie from "js-cookie";
 import { LockClosedIcon } from "@heroicons/react/solid";
 import { useAuth } from "@hooks/useAuth";
 export default function Login() {
   const [error, setError] = useState({ state: false, message: null });
+  const [checked, setChecked] = useState(false);
   const router = useRouter();
   const emailRef = useRef();
   const passwordRef = useRef();
   const { signIn } = useAuth();
 
+  useEffect(() => {
+    const rememberData = Cookie.get("remember");
+    if (rememberData) {
+      const parsedRemember = JSON.parse(rememberData);
+      emailRef.current.value = parsedRemember.email;
+      passwordRef.current.value = parsedRemember.password;
+      setChecked(true);
+    }
+  }, []);
+
+  const toogleChecked = () => {
+    setChecked(!checked);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
+    checked ? Cookie.set("remember", JSON.stringify({ email, password })) : Cookie.remove("remember");
     signIn(email, password)
       .then(() => {
         router.push("/dashboard");
@@ -28,7 +45,6 @@ export default function Login() {
       });
   };
 
-  console.log(error.message);
   return (
     <>
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -74,7 +90,14 @@ export default function Login() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  onChange={toogleChecked}
+                  checked={checked}
+                />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
                   Remember me
                 </label>

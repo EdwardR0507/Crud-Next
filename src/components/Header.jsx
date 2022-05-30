@@ -3,11 +3,11 @@ import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { useAuth } from "@hooks/useAuth";
+import { useRouter } from "next/router";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", current: true },
-  { name: "Productos", href: "/dashboard/products/", current: false },
-  { name: "Ventas", href: "#", current: false },
+  { name: "Dashboard", href: "/dashboard" },
+  { name: "Productos", href: "/dashboard/products" },
 ];
 const userNavigation = [
   { name: "Your Profile", href: "#" },
@@ -19,6 +19,7 @@ function classNames(...classes) {
 }
 
 export default function Header() {
+  const { pathname } = useRouter();
   const { user, logout } = useAuth();
   const userData = {
     name: user?.name,
@@ -43,8 +44,8 @@ export default function Header() {
                         <a
                           key={item.name}
                           href={item.href}
-                          className={classNames(item.current ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white", "px-3 py-2 rounded-md text-sm font-medium")}
-                          aria-current={item.current ? "page" : undefined}
+                          className={classNames(item.href === pathname ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white", "px-3 py-2 rounded-md text-sm font-medium")}
+                          aria-current={item.href === pathname ? "page" : undefined}
                         >
                           {item.name}
                         </a>
@@ -105,8 +106,8 @@ export default function Header() {
                     key={item.name}
                     as="a"
                     href={item.href}
-                    className={classNames(item.current ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white", "block px-3 py-2 rounded-md text-base font-medium")}
-                    aria-current={item.current ? "page" : undefined}
+                    className={classNames(item.href === pathname ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white", "block px-3 py-2 rounded-md text-base font-medium")}
+                    aria-current={item.href === pathname ? "page" : undefined}
                   >
                     {item.name}
                   </Disclosure.Button>
